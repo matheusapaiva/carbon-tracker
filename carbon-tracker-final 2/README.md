@@ -26,7 +26,7 @@ Sistema RESTful para gestão de emissões de carbono e iniciativas ESG, desenvol
 
 **1. Clone o repositório:**
 ```bash
-git clone https://github.com/seu-usuario/carbon-tracker.git
+git clone https://github.com/matheusapaiva/carbon-tracker.git
 cd carbon-tracker
 ```
 
