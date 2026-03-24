@@ -1,0 +1,27 @@
+spring:
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/carbontracker}
+      database: ${MONGODB_DATABASE:carbontracker}
+
+server:
+  port: ${PORT:8080}
+
+app:
+  security:
+    username: ${APP_USERNAME:admin}
+    password: ${APP_PASSWORD:admin}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    com.matheuspaiva: INFO
+    org.springframework.data.mongodb: WARN

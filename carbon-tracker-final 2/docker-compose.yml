@@ -1,0 +1,65 @@
+version: '3.8'
+
+# ============================================================
+# Carbon Tracker - Ambiente de Desenvolvimento / Staging Local
+# ============================================================
+
+services:
+
+  # ── MongoDB ──────────────────────────────────────────────
+  mongodb:
+    image: mongo:7.0
+    container_name: carbon-tracker-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-root}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-rootpassword}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-carbontracker}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+      - ./scripts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - carbon-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+  # ── Aplicação Spring Boot ─────────────────────────────────
+  carbon-tracker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: carbon-tracker-app
+    restart: unless-stopped
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      MONGODB_URI: mongodb://${MONGO_ROOT_USER:-root}:${MONGO_ROOT_PASSWORD:-rootpassword}@mongodb:27017/${MONGO_DATABASE:-carbontracker}?authSource=admin
+      MONGODB_DATABASE: ${MONGO_DATABASE:-carbontracker}
+      APP_USERNAME: ${APP_USERNAME:-admin}
+      APP_PASSWORD: ${APP_PASSWORD:-admin}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-default}
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    networks:
+      - carbon-network
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 45s
+
+volumes:
+  mongo_data:
+    driver: local
+
+networks:
+  carbon-network:
+    driver: bridge

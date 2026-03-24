@@ -1,0 +1,13 @@
+spring:
+  data:
+    mongodb:
+      uri: ${MONGO_URI}
+      database: ${MONGO_DB:carbontracker_prod}
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.matheuspaiva: WARN
+    root: ERROR

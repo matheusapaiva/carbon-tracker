@@ -1,0 +1,12 @@
+spring:
+  data:
+    mongodb:
+      uri: ${MONGO_URI:mongodb://mongo:27017/carbontracker_staging}
+      database: ${MONGO_DB:carbontracker_staging}
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.matheuspaiva: DEBUG
